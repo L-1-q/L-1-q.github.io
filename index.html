@@ -22,12 +22,12 @@
     var CONFIG = {"hostname":"l-1-q.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="勤奋和耐心是最朴实的道理">
+  <meta name="description" content="勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!">
 <meta property="og:type" content="website">
 <meta property="og:title" content="L-1-q&#39;s blog">
 <meta property="og:url" content="http://l-1-q.top/index.html">
 <meta property="og:site_name" content="L-1-q&#39;s blog">
-<meta property="og:description" content="勤奋和耐心是最朴实的道理">
+<meta property="og:description" content="勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="L-1-q">
 <meta name="twitter:card" content="summary">
@@ -164,12 +164,80 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="L-1-q">
+      <meta itemprop="description" content="勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L-1-q's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">解决蚁剑执行mssql数据库命令执行报错问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-08 22:44:40" itemprop="dateCreated datePublished" datetime="2021-12-08T22:44:40+08:00">2021-12-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-09 10:56:52" itemprop="dateModified" datetime="2021-12-09T10:56:52+08:00">2021-12-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>因为公司的需求要去搞渗透赛,里面正好有一个场景就是mssql的数据库的命令执行然后获取flag,但是按照wp执行以后产生了问题,出现了**-2147217887:ODBC 驱动程序不支持所需的属性**<br><img src="img/12-08-1.png"><br>此时就产生了怀疑,以为是网络或者是蚁剑的版本的问题,因为在靶场平台是可以执行的,于是将蚁剑切换了版本,还是不行.<br>本着搜索引擎的强大,直接在百度搜索一只出现答非所问的问题,最终在google发现了解决的办法.</p>
+<p>原因是在source\core\asp\template\database\sqlserver.js中执行SQL语句代码模板中使用Recordset对象的open方法来执行SQL语句，貌似是该方法不支持请求xp_cmdshell这种过程对象，具体我也不清楚，这里参考了下菜刀的方式解决。<br>删除102、103行代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Set Rs=CreateObject(&quot;Adodb.Recordset&quot;): </span><br><span class="line">Rs.open &quot;&quot;&amp;bd(Request(&quot;$&#123;arg2&#125;&quot;))&amp;&quot;&quot;,Conn,1,1:</span><br></pre></td></tr></table></figure>
+<p>更改为Connection对象的Execute方法直接执行<br><code>Set Rs=Conn.Execute(&quot;&quot;&amp;bd(Request(&quot;$&#123;arg2&#125;&quot;))&amp;&quot;&quot;):</code><br>为了防止执行一些返回recordset.Fields为0的命令（如开启xp_cmdshell的命令：EXEC sp_configure “show advanced options”,1）后面程序进入死循环的情况，这里还需要加一个if判断：<br>在FN=Rs.Fields.Count-1:的后面添加<br><code>If FN=-1 Then: Response.Write HD&amp;&quot;Execute Successfully!&quot;&amp;CO&amp;RN: Else:</code><br>再在loop后面添加End If:<br><img src="img/12-08-02.png"><br>最后测试成功.<br>当然也可以利用navcat数据库连接然后去执行命令,或者利用菜刀2014都是可以的.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/07/%E6%88%91%E6%9D%A5%E5%95%A6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
       <meta itemprop="name" content="L-1-q">
-      <meta itemprop="description" content="勤奋和耐心是最朴实的道理">
+      <meta itemprop="description" content="勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -280,16 +348,20 @@
     <img class="site-author-image" itemprop="image" alt="L-1-q"
       src="/images/avatar.png">
   <p class="site-author-name" itemprop="name">L-1-q</p>
-  <div class="site-description" itemprop="description">勤奋和耐心是最朴实的道理</div>
+  <div class="site-description" itemprop="description">勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!</div>
 </div>
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
       </div>
   </nav>
 </div>
