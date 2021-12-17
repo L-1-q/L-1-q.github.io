@@ -22,23 +22,29 @@
     var CONFIG = {"hostname":"l-1-q.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="因为公司的需求要去搞渗透赛,里面正好有一个场景就是mssql的数据库的命令执行然后获取flag,但是按照wp执行以后产生了问题,出现了**-2147217887:ODBC 驱动程序不支持所需的属性**此时就产生了怀疑,以为是网络或者是蚁剑的版本的问题,因为在靶场平台是可以执行的,于是将蚁剑切换了版本,还是不行.本着搜索引擎的强大,直接在百度搜索一只出现答非所问的问题,最终在google发现了解决的">
+  <meta name="description" content="上周六打了南航的ctf比赛,web总共有4道题目,一道是ssti一道是grafana,两个的知识点均已复盘.剩下的两道题目由于当时环境崩溃了,然后就出去了没有看,现在官方提供了一道题目的源码,所以来复盘一下. Make Me Cry环境搭建官方提供了docker的文件,直接跑起来,但是我本地跑的时候出现了权限的问题,所以修改一下dockerfile解决问题. 题目复现及复盘首先访问主页,因为环境启">
 <meta property="og:type" content="article">
-<meta property="og:title" content="解决蚁剑执行mssql数据库命令执行报错问题">
-<meta property="og:url" content="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:title" content="NUAA题目复盘">
+<meta property="og:url" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/index.html">
 <meta property="og:site_name" content="L-1-q&#39;s blog">
-<meta property="og:description" content="因为公司的需求要去搞渗透赛,里面正好有一个场景就是mssql的数据库的命令执行然后获取flag,但是按照wp执行以后产生了问题,出现了**-2147217887:ODBC 驱动程序不支持所需的属性**此时就产生了怀疑,以为是网络或者是蚁剑的版本的问题,因为在靶场平台是可以执行的,于是将蚁剑切换了版本,还是不行.本着搜索引擎的强大,直接在百度搜索一只出现答非所问的问题,最终在google发现了解决的">
+<meta property="og:description" content="上周六打了南航的ctf比赛,web总共有4道题目,一道是ssti一道是grafana,两个的知识点均已复盘.剩下的两道题目由于当时环境崩溃了,然后就出去了没有看,现在官方提供了一道题目的源码,所以来复盘一下. Make Me Cry环境搭建官方提供了docker的文件,直接跑起来,但是我本地跑的时候出现了权限的问题,所以修改一下dockerfile解决问题. 题目复现及复盘首先访问主页,因为环境启">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/12-08-1.png">
-<meta property="og:image" content="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/12-08-02.png">
-<meta property="article:published_time" content="2021-12-08T14:44:40.000Z">
-<meta property="article:modified_time" content="2021-12-09T06:07:06.517Z">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/1.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/2.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/3.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/4.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/5.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/6.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/7.png">
+<meta property="og:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/8.png">
+<meta property="article:published_time" content="2021-12-17T03:48:45.000Z">
+<meta property="article:modified_time" content="2021-12-17T08:08:25.707Z">
 <meta property="article:author" content="L-1-q">
-<meta property="article:tag" content="蚁剑">
+<meta property="article:tag" content="crystal">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/12-08-1.png">
+<meta name="twitter:image" content="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/1.png">
 
-<link rel="canonical" href="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/">
+<link rel="canonical" href="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/">
 
 
 <script id="page-configurations">
@@ -51,7 +57,7 @@
   };
 </script>
 
-  <title>解决蚁剑执行mssql数据库命令执行报错问题 | L-1-q's blog</title>
+  <title>NUAA题目复盘 | L-1-q's blog</title>
   
 
 
@@ -171,7 +177,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/">
+    <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -184,7 +190,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          解决蚁剑执行mssql数据库命令执行报错问题
+          NUAA题目复盘
         </h1>
 
         <div class="post-meta">
@@ -193,23 +199,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-12-08 22:44:40" itemprop="dateCreated datePublished" datetime="2021-12-08T22:44:40+08:00">2021-12-08</time>
+              <time title="创建时间：2021-12-17 11:48:45 / 修改时间：16:08:25" itemprop="dateCreated datePublished" datetime="2021-12-17T11:48:45+08:00">2021-12-17</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-09 14:07:06" itemprop="dateModified" datetime="2021-12-09T14:07:06+08:00">2021-12-09</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" itemprop="url" rel="index"><span itemprop="name">渗透测试</span></a>
+                  <a href="/categories/%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/" itemprop="url" rel="index"><span itemprop="name">题目复盘</span></a>
                 </span>
             </span>
 
@@ -224,11 +224,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>因为公司的需求要去搞渗透赛,里面正好有一个场景就是mssql的数据库的命令执行然后获取flag,但是按照wp执行以后产生了问题,出现了**-2147217887:ODBC 驱动程序不支持所需的属性**<br><img src="/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/12-08-1.png"><br>此时就产生了怀疑,以为是网络或者是蚁剑的版本的问题,因为在靶场平台是可以执行的,于是将蚁剑切换了版本,还是不行.<br>本着搜索引擎的强大,直接在百度搜索一只出现答非所问的问题,最终在google发现了解决的办法.</p>
-<p>原因是在source\core\asp\template\database\sqlserver.js中执行SQL语句代码模板中使用Recordset对象的open方法来执行SQL语句，貌似是该方法不支持请求xp_cmdshell这种过程对象，具体我也不清楚，这里参考了下菜刀的方式解决。<br>删除102、103行代码</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Set Rs=CreateObject(&quot;Adodb.Recordset&quot;): </span><br><span class="line">Rs.open &quot;&quot;&amp;bd(Request(&quot;$&#123;arg2&#125;&quot;))&amp;&quot;&quot;,Conn,1,1:</span><br></pre></td></tr></table></figure>
-<p>更改为Connection对象的Execute方法直接执行<br><code>Set Rs=Conn.Execute(&quot;&quot;&amp;bd(Request(&quot;$&#123;arg2&#125;&quot;))&amp;&quot;&quot;):</code><br>为了防止执行一些返回recordset.Fields为0的命令（如开启xp_cmdshell的命令：EXEC sp_configure “show advanced options”,1）后面程序进入死循环的情况，这里还需要加一个if判断：<br>在FN=Rs.Fields.Count-1:的后面添加<br><code>If FN=-1 Then: Response.Write HD&amp;&quot;Execute Successfully!&quot;&amp;CO&amp;RN: Else:</code><br>再在loop后面添加End If:<br><img src="/2021/12/08/%E8%A7%A3%E5%86%B3%E8%9A%81%E5%89%91%E6%89%A7%E8%A1%8Cmssql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%8A%A5%E9%94%99%E9%97%AE%E9%A2%98/12-08-02.png"><br>最后测试成功.<br>当然也可以利用navcat数据库连接然后去执行命令,或者利用菜刀2014都是可以的.</p>
-<p>参考链接: <a target="_blank" rel="noopener" href="https://ca3tie1.github.io/post/yi-jian-asp-lian-sqlserver-zhi-xing-xp_cmdshell-bao-qu-dong-cheng-xu-bu-zhi-chi-suo-xu-de-shu-xing-jie-jue-ban-fa/">https://ca3tie1.github.io/post/yi-jian-asp-lian-sqlserver-zhi-xing-xp_cmdshell-bao-qu-dong-cheng-xu-bu-zhi-chi-suo-xu-de-shu-xing-jie-jue-ban-fa/</a></p>
+        <p>上周六打了南航的ctf比赛,web总共有4道题目,一道是ssti一道是grafana,两个的知识点均已复盘.剩下的两道题目由于当时环境崩溃了,然后就出去了没有看,现在官方提供了一道题目的源码,所以来复盘一下.</p>
+<h1 id="Make-Me-Cry"><a href="#Make-Me-Cry" class="headerlink" title="Make Me Cry"></a>Make Me Cry</h1><h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>官方提供了docker的文件,直接跑起来,但是我本地跑的时候出现了权限的问题,所以修改一下dockerfile解决问题.<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/1.png"></p>
+<h2 id="题目复现及复盘"><a href="#题目复现及复盘" class="headerlink" title="题目复现及复盘"></a>题目复现及复盘</h2><p>首先访问主页,因为环境启动需要编译main.cr文件所以需要一段时间才能起来.<br>起来以后可以看到该文件夹下有哪些文件<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/2.png"><br>根据提示去访问/flag<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/3.png"><br>所以利用burp抓包去访问flag<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/4.png"><br>可以看到无法直接访问flag文件<br>所以去访问该目录下的其他文件,可以访问到main.cr来阅读源码<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/5.png"><br>为了方便阅读我们直接在vscode中查看main.cr的代码<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/6.png"></p>
+<blockquote>
+<p>tips:burp中出现的传递进去的参数就是此时的代码,这处是我为了调试后面加的.</p>
+</blockquote>
+<p>那么剩下的就是代码审计了,刚开始我是不知道这个代码是用的什么语言,直到看到了cr后缀以及题目使用的镜像,经过查阅是crystal,所以我们知道这个是利用crystal语言些写的一个Web服务,那我们需要简单快速的阅读一下crystal的语言文档(链接:<a target="_blank" rel="noopener" href="https://crystal-lang.org/),%E7%9F%A5%E9%81%93%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E7%B1%BBruby%E8%AF%AD%E8%A8%80,%E5%85%B6%E5%AE%9E%E4%B8%8D%E7%AE%A1%E7%9F%A5%E4%B8%8D%E7%9F%A5%E9%81%93%E8%BF%99%E4%B8%AA%E8%AF%AD%E8%A8%80%E6%98%AF%E4%BB%80%E4%B9%88%E9%83%BD%E4%B8%8D%E5%BD%B1%E5%93%8D%E6%88%91%E4%BB%AC%E9%98%85%E8%AF%BB%E4%BB%A3%E7%A0%81">https://crystal-lang.org/),知道这是一个类ruby语言,其实不管知不知道这个语言是什么都不影响我们阅读代码</a>.<br>我们可以看到2行引用了一个包之类的东西,然后就是在3-14行处定义了一个函数.在15行开始去设置http,16行处设置头文件,17行处设置路径为/flag然后18行处设置传递方式为POST. 参数传递进来以后在20-22行出做了三次操作,然后在24行处进行一个判断,如果匹配<code>*fl*</code>则返回<code>“you can&#39;t get flag directly&quot;</code>,如果不是则会输出flag的内容,此时就是该题目的重点,如何在三次处理后绕过<code>*fl*</code>的匹配获取到flag.<br>首先查看file.match这个函数的文档,可以看到<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/7.png"><br>在文档中看到*这个不会匹配/,所以我们可以通过传递./flag来绕过<code>*fl*</code>这个匹配过滤<br>那我们现在输入一下<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/8.png"><br>可以看到输出的是flag,这是因为file.basename将./flag转换成了flag去掉了我们后面的斜杠<br>这个时候就需要的一个/输入进来的时候不会作为路径而是作为一个完整的字符串,所以就需要查看这个normalie函数是干嘛用的.<br>根据代码可以看出来是处理字符十进制在65281-65374之间并且将他们减去65248,经过查阅资料可以知道这个函数是将全角字符转换为半角字符.知道这个函数的作用以后,并且basename函数是在normalize函数之前,也就是可以利用全角字符<code>/</code>来达到绕过basename函数然后在normarlize函数的时候转换成半角字符,最后输入到后续的函数中.<br>所以我们利用<code>.／flag</code>即可<br>原本的wp中最前面还有一个<code>/</code>,我想是因为为了成为一个路径吧,但是basename处理的时候前面的路径都会删除,也就是有没有这<code>/</code>其实没有啥关系,但是这个<code>.</code>是必须有的,否则的话是<code>/flag </code>就会找不到这个文件.<br>(tips:在burp无法直接输入全角字符,所以利用hackbar输入全角字符,然后利用burp自带的编码,转换一下复制进去即可)</p>
 
     </div>
 
@@ -238,7 +240,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%9A%81%E5%89%91/" rel="tag"># 蚁剑</a>
+              <a href="/tags/crystal/" rel="tag"># crystal</a>
           </div>
 
         
@@ -247,13 +249,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/12/07/%E6%88%91%E6%9D%A5%E5%95%A6/" rel="prev" title="我来啦">
-      <i class="fa fa-chevron-left"></i> 我来啦
+    <a href="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/" rel="prev" title="CVE-2021-43798 Grafana 任意文件读取漏洞分析">
+      <i class="fa fa-chevron-left"></i> CVE-2021-43798 Grafana 任意文件读取漏洞分析
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/12/09/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/" rel="next" title="西湖论剑题目复盘">
-      西湖论剑题目复盘 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -312,6 +311,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Make-Me-Cry"><span class="nav-number">1.</span> <span class="nav-text">Make Me Cry</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">环境搭建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%8E%B0%E5%8F%8A%E5%A4%8D%E7%9B%98"><span class="nav-number">1.2.</span> <span class="nav-text">题目复现及复盘</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

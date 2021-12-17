@@ -164,6 +164,80 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="L-1-q">
+      <meta itemprop="description" content="勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L-1-q's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/" class="post-title-link" itemprop="url">NUAA题目复盘</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-12-17 11:48:45 / 修改时间：16:08:25" itemprop="dateCreated datePublished" datetime="2021-12-17T11:48:45+08:00">2021-12-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/" itemprop="url" rel="index"><span itemprop="name">题目复盘</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>上周六打了南航的ctf比赛,web总共有4道题目,一道是ssti一道是grafana,两个的知识点均已复盘.剩下的两道题目由于当时环境崩溃了,然后就出去了没有看,现在官方提供了一道题目的源码,所以来复盘一下.</p>
+<h1 id="Make-Me-Cry"><a href="#Make-Me-Cry" class="headerlink" title="Make Me Cry"></a>Make Me Cry</h1><h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><p>官方提供了docker的文件,直接跑起来,但是我本地跑的时候出现了权限的问题,所以修改一下dockerfile解决问题.<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/1.png"></p>
+<h2 id="题目复现及复盘"><a href="#题目复现及复盘" class="headerlink" title="题目复现及复盘"></a>题目复现及复盘</h2><p>首先访问主页,因为环境启动需要编译main.cr文件所以需要一段时间才能起来.<br>起来以后可以看到该文件夹下有哪些文件<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/2.png"><br>根据提示去访问/flag<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/3.png"><br>所以利用burp抓包去访问flag<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/4.png"><br>可以看到无法直接访问flag文件<br>所以去访问该目录下的其他文件,可以访问到main.cr来阅读源码<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/5.png"><br>为了方便阅读我们直接在vscode中查看main.cr的代码<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/6.png"></p>
+<blockquote>
+<p>tips:burp中出现的传递进去的参数就是此时的代码,这处是我为了调试后面加的.</p>
+</blockquote>
+<p>那么剩下的就是代码审计了,刚开始我是不知道这个代码是用的什么语言,直到看到了cr后缀以及题目使用的镜像,经过查阅是crystal,所以我们知道这个是利用crystal语言些写的一个Web服务,那我们需要简单快速的阅读一下crystal的语言文档(链接:<a target="_blank" rel="noopener" href="https://crystal-lang.org/),%E7%9F%A5%E9%81%93%E8%BF%99%E6%98%AF%E4%B8%80%E4%B8%AA%E7%B1%BBruby%E8%AF%AD%E8%A8%80,%E5%85%B6%E5%AE%9E%E4%B8%8D%E7%AE%A1%E7%9F%A5%E4%B8%8D%E7%9F%A5%E9%81%93%E8%BF%99%E4%B8%AA%E8%AF%AD%E8%A8%80%E6%98%AF%E4%BB%80%E4%B9%88%E9%83%BD%E4%B8%8D%E5%BD%B1%E5%93%8D%E6%88%91%E4%BB%AC%E9%98%85%E8%AF%BB%E4%BB%A3%E7%A0%81">https://crystal-lang.org/),知道这是一个类ruby语言,其实不管知不知道这个语言是什么都不影响我们阅读代码</a>.<br>我们可以看到2行引用了一个包之类的东西,然后就是在3-14行处定义了一个函数.在15行开始去设置http,16行处设置头文件,17行处设置路径为/flag然后18行处设置传递方式为POST. 参数传递进来以后在20-22行出做了三次操作,然后在24行处进行一个判断,如果匹配<code>*fl*</code>则返回<code>“you can&#39;t get flag directly&quot;</code>,如果不是则会输出flag的内容,此时就是该题目的重点,如何在三次处理后绕过<code>*fl*</code>的匹配获取到flag.<br>首先查看file.match这个函数的文档,可以看到<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/7.png"><br>在文档中看到*这个不会匹配/,所以我们可以通过传递./flag来绕过<code>*fl*</code>这个匹配过滤<br>那我们现在输入一下<br><img src="/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/8.png"><br>可以看到输出的是flag,这是因为file.basename将./flag转换成了flag去掉了我们后面的斜杠<br>这个时候就需要的一个/输入进来的时候不会作为路径而是作为一个完整的字符串,所以就需要查看这个normalie函数是干嘛用的.<br>根据代码可以看出来是处理字符十进制在65281-65374之间并且将他们减去65248,经过查阅资料可以知道这个函数是将全角字符转换为半角字符.知道这个函数的作用以后,并且basename函数是在normalize函数之前,也就是可以利用全角字符<code>/</code>来达到绕过basename函数然后在normarlize函数的时候转换成半角字符,最后输入到后续的函数中.<br>所以我们利用<code>.／flag</code>即可<br>原本的wp中最前面还有一个<code>/</code>,我想是因为为了成为一个路径吧,但是basename处理的时候前面的路径都会删除,也就是有没有这<code>/</code>其实没有啥关系,但是这个<code>.</code>是必须有的,否则的话是<code>/flag </code>就会找不到这个文件.<br>(tips:在burp无法直接输入全角字符,所以利用hackbar输入全角字符,然后利用burp自带的编码,转换一下复制进去即可)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -709,7 +783,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -722,7 +796,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
