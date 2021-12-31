@@ -164,6 +164,78 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="L-1-q">
+      <meta itemprop="description" content="勤奋和耐心是最朴实的道理,我们会在腐朽的日子里光芒万丈!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="L-1-q's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" class="post-title-link" itemprop="url">从一道题目到ruby代码审计</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-12-31 09:47:46 / 修改时间：15:41:56" itemprop="dateCreated datePublished" datetime="2021-12-31T09:47:46+08:00">2021-12-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/" itemprop="url" rel="index"><span itemprop="name">题目复盘</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>修复了一道环境题目,发现是一个web题目,而且是ruby相关的题目,因为前几天做过一个跟ruby相关的题目,于是修好环境以后复盘一下</p>
+<h2 id="修复"><a href="#修复" class="headerlink" title="修复"></a>修复</h2><p>首先docker build以后报错<br><img src="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/1.png"><br>根据提示有两种修复方式 1. 将基础镜像的版本从16.04升级到18.04 2. 给其中几个组件制定版本如图所示<br><img src="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/2.png"><br>修复完成后,利用docker映射9999端口即可访问.</p>
+<h2 id="复盘"><a href="#复盘" class="headerlink" title="复盘"></a>复盘</h2><p>题目是直接给选手一个附件的,也就是ruby的源码.<br>那么首先需要的就是ruby的代码审计,快速了解ruby的基础语法以后,我们来看一下代码<br>首先根据nc连接题目可以知道是通过两次命令行输入传入数据,一个是url另一个是dir<br>那么我们开始阅读源码<br><img src="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/3.png"><br>ruby程序运行时从begin开始end结束的<br>首先54行处,获取到当前ruby运行的目录路径,站在上帝视角我们知道是/home/ctf,但实际环境中我们是不知道的.<br>55行出,可以看到提示,flag的文件名称叫做flag.txt,所以我们需要读取这个文件.<br>57行处,在命令行输出一个语句,这里的p就是puts,ruby中的输出语句<br>58行处,利用命令行获取url,利用的gets.chomp跟gets的区别是,一个有换行符一个没有.<br>60行和61行处,获取一个dir的路径.<br>63行处进行一个判断,判断输入的是否为一个正确的url和一个正确的路径.<br>这两个函数.就需要去上面看一下<br><img src="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/4.png"><br>利用string类定义了几个函数,将字符串作为代码来执行.<br>定义了判断url的函数,判断是否具有http或者https<br>定义了判断dir的函数,判断是不能含有一些特定的字符且长度不能小于4<br>返回程序中63行处,判断完毕以后,都符合要求则来到68行处,利用mkdir_p函数在当前路径下新建一个目录并且给到777权限.<br>后续的rescue是一个抛出异常,不用管,继续往后走.<br><img src="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/5.png"><br>76行处,会新建一个result.html文件并且可写<br>77行处,利用函数去读取我们给的url里面的内容,并且赋值给到html<br>78行处,在result文件中写入html的标签<br>在80行处,利用parse函数,提取到网页中的img标签中src属性后面的值,保存给img,然后在87行处利用协议去读区这个文件,并且利用base64加密,然后写入result中.<br>最后在95行处读取出来.<br>此时我们的想法就是利用这个读取文件的方式去进行目录穿越去读取flag.txt文件<br>首先知道open函数需要打开一个路径,所以我们构造的url需要符合一个路径,并且还得是一个url格式,那么我们新建的文件夹需要为<code>http:</code>,这样读取的src就可以看成是一个目录路径了.<br>构造一个网页里面含有img标签和src属性并且后续的穿越路径放在后面.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;img src=&quot;http:/../../../../../../../../flag.txt&quot;&gt;</span><br></pre></td></tr></table></figure>
+<p>将其放在vps上,利用ruby去读取然后得到flag.<br><img src="/2021/12/31/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9B%AE%E5%88%B0ruby%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/6.png"><br>该题目内部还跑着一个apache2,但是我发现将其停掉以后也不影响做题目,并且该源码也是给到了选手,可能出题人的意图是为了迷惑选手么?</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://l-1-q.top/2021/12/17/NUAA%E9%A2%98%E7%9B%AE%E5%A4%8D%E7%9B%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -269,7 +341,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-16 15:57:05" itemprop="dateModified" datetime="2021-12-16T15:57:05+08:00">2021-12-16</time>
+                <time title="修改时间：2021-12-18 23:40:03" itemprop="dateModified" datetime="2021-12-18T23:40:03+08:00">2021-12-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -295,7 +367,7 @@
           <p>起因是因为打南航的ctf比赛,第一道web题目就是一个grafana的题目,经过搜寻直接利用新爆出来的任意文件读取漏洞,读到flag.所以复盘总结的时候来看一下这个漏洞.</p>
 <h2 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h2><p>未授权用户可以任意读取grafana下的文件,但是不能直接getshell,需要利用读文件去配合其他漏洞,综合利用.</p>
 <h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>通过阅读大佬们的文章,大体可以分为两种分析方式,1是从历史漏洞分析来推该漏洞2是从官方更新后的文件diff来看修改了那里.<br>这次主要是通过第一种,也是在如何网上出消息可以分析出来具体问题的方法(当然是看的别人的方法).<br>首先就是借鉴历史漏洞的思路,看到CVE-2020-13379这个经典漏洞,是从api.go文件入手,那我们也从这个文件入手.<br>首先从githib上下载grafan8.3.0的源码文件,然后在/pkg/api/api.go下查看代码.<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/1.png"><br>可以看到很多个路由,第二个参数带有sign看起来像是是否需要验证.当然也有一些只有两个参数,那么我们就猜测,两个参数的就是不需要验证的,既然是未授权访问,那么就找只有两个参数的未授权的接口:</p>
-<p><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/2.png"><br>然后我们根据burp来验证一下具体的现象<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/3.png"><br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/4.png"><br>所以我们可以根据注释来判断功能,看参数个数来判断是否授权,然后就需要找可以输入filepath的功能接口的函数,通过这种方式快速的过一下,找到这个plugins<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/5.png"><br>跳转到getPluginAssets这个函数<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/6.png"><br>根据整个函数的注释可以知道这个getPluginAssets是为了返回插件的公共资源,而他传递的格式为<code>/public/plugins/插件名称/需要访问的资源</code><br>现在我们来大概分析一下代码<br>首先可以看到在256行处,插件的名称传递给了参数pluginID然后在257行处利用函数判断是否有这个插件,没有的话就会在258和260行处报404的错误.<br>284行处接受了filepath并且利用Clean函数清除了多余的字符,从*代表的路径和插件目录在285行处合并,但是没有过滤.<br>后续可以看到在获取到文件路径以后,没有过多的处理,295行处打开这个路径的文件,然后在322行处返回内容.<br>这个任意文件读取的漏洞就产生了.<br>然后找到一个内置的插件就可以使用这个漏洞了.<br>该漏洞后续的修复主要是利用一行<br><code>rel, err := filepath.Rel(&quot;/&quot;, requestedFile)</code><br><code>func Rel(basepath, targpath string) (string, error)</code><br>该函数以basepath为基准，返回targpath相对于basepath的相对路径，也就是说如果basepath为/a，targpath为/a/b/c，那么则会返回/b/c，如果两个参数有一个为绝对路径，一个为相对路径，则会返回错误<br>所以此时输入../则会无效化,无法路径穿越了</p>
+<p><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/2.png"><br>然后我们根据burp来验证一下具体的现象<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/3.png"><br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/4.png"><br>所以我们可以根据注释来判断功能,看参数个数来判断是否授权,然后就需要找可以输入filepath的功能接口的函数,通过这种方式快速的过一下,找到这个plugins<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/5.png"><br>跳转到getPluginAssets这个函数<br><img src="/2021/12/15/CVE-2021-43798%20Grafana%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/6.png"><br>根据整个函数的注释可以知道这个getPluginAssets是为了返回插件的公共资源,而他传递的格式为<code>/public/plugins/插件名称/需要访问的资源</code><br>现在我们来大概分析一下代码<br>首先可以看到在277行处,插件的名称传递给了参数pluginID然后在278行处利用函数判断是否有这个插件,没有的话就会在258和260行处报404的错误.<br>284行处接受了filepath并且利用Clean函数清除了多余的字符,从*代表的路径和插件目录在285行处合并,但是没有过滤.<br>后续可以看到在获取到文件路径以后,没有过多的处理,295行处打开这个路径的文件,然后在322行处返回内容.<br>这个任意文件读取的漏洞就产生了.<br>然后找到一个内置的插件就可以使用这个漏洞了.<br>该漏洞后续的修复主要是利用一行<br><code>rel, err := filepath.Rel(&quot;/&quot;, requestedFile)</code><br><code>func Rel(basepath, targpath string) (string, error)</code><br>该函数以basepath为基准，返回targpath相对于basepath的相对路径，也就是说如果basepath为/a，targpath为/a/b/c，那么则会返回/b/c，如果两个参数有一个为绝对路径，一个为相对路径，则会返回错误<br>所以此时输入../则会无效化,无法路径穿越了</p>
 <p>参考链接: 1. <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/dqJ3F_fStlj78S0qhQ3Ggw">https://mp.weixin.qq.com/s/dqJ3F_fStlj78S0qhQ3Ggw</a><br>        2. <a target="_blank" rel="noopener" href="https://saucer-man.com/information_security/856.html">https://saucer-man.com/information_security/856.html</a></p>
 
       
@@ -783,7 +855,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -796,7 +868,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
